@@ -1,0 +1,48 @@
+﻿@inject HttpClient Http
+@inject NavigationManager navigation
+<h3>Product List</h3>
+<ul class="list-unstyled">
+    @foreach (var product in products)
+    {
+        <li class="media">
+            <div class="media-img-wrapper">
+                <a href="#">
+                    <img class="media-img" src="@product.ImageUrl" alt="@product.Title">
+                </a>
+            </div>
+            <div class="media-body">
+                <h4 class="mb-2">@product.Title</h4>
+                <p>@product.Description</p>
+                <h5 class="price">
+                   €@product.Price
+                </h5>
+                <button class="btn btn-primary" @onclick="(() => Edit(product.Id))">Edit</button>
+                <button class="btn btn-danger" @onclick="(() => Delete(product.Id))">Delete</button>
+            </div>
+        </li>
+    }
+</ul>
+@code {
+    private static List<Product> products = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        var result = await Http.GetFromJsonAsync<List<Product>>("api/product");
+        if (result != null)
+            products = result;
+
+        Console.WriteLine(products);
+
+    }
+    void Edit(int id)
+    {
+        navigation.NavigateTo($"EditProduct/{id}");   
+    }
+    public async Task Delete(int id)
+    {
+        var result = await Http.DeleteAsync($"api/product/delete/{id}");
+         navigation.NavigateTo("/",true);
+    }
+
+
+}
